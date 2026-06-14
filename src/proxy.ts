@@ -2,7 +2,14 @@ import { type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 export async function proxy(request: NextRequest) {
-  return await updateSession(request);
+  try {
+    return await updateSession(request);
+  } catch (error) {
+    console.error('Proxy middleware error:', error);
+    // Fallback: let request through without auth session
+    const { NextResponse } = await import('next/server');
+    return NextResponse.next();
+  }
 }
 
 export const config = {
